@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<title>Frontpage</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+.container
+{
+	height: 200px;
+	position: relative;
+	top:200px;
+}
+
+.center
+{
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.block
+{
+	color: Black;
+	background-color: #4CAF50;
+	width: 200px;
+	padding: 50px 10px;
+	text-align:center;
+}
+
+.block:hover
+{
+	background-color: Black;
+	color:white;
+}
+
+/* Style the header */
+header 
+{
+	font-family: "Courier New", Courier, monospace;
+	text-align: Center;
+	font-size: 500%;
+	color: black;
+	top:400px
+}
+
+
+
+
+
+
+/* Responsive layout - makes the menu and the content (inside the section) sit on top of each other instead of next to each other */
+
+@media (max-width: 1200px) {
+  section {
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+}
+
+</style>
+<header>
+
+PhoneStore666
+
+</header>
+<body>
+
+	<div class="container">
+		<div class="center">
+			<button class="block" onclick="document.location='frontpage.php'">ENTER</button>
+		</div>
+	</div> 
+</body>
+</html>
+
+
