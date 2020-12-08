@@ -1,3 +1,14 @@
+<?php
+// Initialize the session
+session_start();
+
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -94,11 +105,14 @@ aside {
 </style>
 </head>
 <body>
-	<header>
+	<a href="/frontpage.php">
+		<header>
+                	<h2>PhoneStore666</h2>
+        	</header>
+	</a>
+	
+	<button onclick= "document.location= 'logout.php'"> Logout </button>
 
-                <h2>PhoneStore666</h2>
-
-        </header>
         <section>
                 <article>
 
@@ -110,64 +124,95 @@ aside {
                                 $servername = "localhost";
                                 $username = "root";
                                 $password = "d0018eServer!";
-                                $dbname = "store";
+                                $dbname = "user";
+				$dbname2 = "store";
 
                                 // Create connection
-
                                 $conn = new mysqli($servername, $username, $password, $dbname);
-                        // Check connection
+                        	// Check connection
                                 if ($conn->connect_error) {
-
                                         die("Connection failed: " . $conn->connect_error);
-
                                 }
+				//Create second connection
+				$conn2 = new mysqli($servername, $username, $password, $dbname2);
 
 
 
-                                mysqli_select_db($con,"ajax_demo");
-                                $sql="SELECT product_name, stock, overall_grading, cost, picture FROM products";
-                                $result = $conn->query($sql);
-
+                                mysqli_select_db($conn,"ajax_demo");
+                                //$sql="SELECT id, Product_ID, cost, quantity FROM cart WHERE id = '".$_SESSION['id']."'";
+                                
+				$sql="SELECT user.cart.id, user.cart.Product_ID, user.cart.cost, user.cart.quantity, store.products.product_name 
+				FROM user.cart 
+				RIGHT JOIN store.products 
+				ON user.cart.Product_ID = store.products.Product_ID 
+				WHERE id = '".$_SESSION['id']."'";
+				
+				$result = $conn->query($sql);
                                 while($row = $result->fetch_assoc()) {
 
-                                        echo  $row["product_name"].  "<br>";
-                                        ?>
-                                        
-                                                <div>
-							<a>
-                                                       	amount in cart:
-                                                        <form method="POST" action="">
-                                                                <input type="submit" id="<?php echo $row["product_name"]?>" name="data" value="Add to cart"/>
-                                                       
-                                                        <button id="<?php echo $row["product_name"]?>" onclick = "productpage(this.id)">Subtract</button>
-                                                        <button id="<?php echo $row["product_name"]?>" onclick = "productpage(this.id)">info</button>
-							</form>
-							<p>Cost: <?php echo $row["cost"]; ?>kr       Stock:<?php echo $row["stock"]; ?>st </p>
-                                        		</a>	
-        						
-					<div>
-                                        <?php
-                                        echo "<br><br>";
-                                }
+					echo  $row["product_name"]. "<br";                                      
 
-                                if(isset($_POST['data'])){
-                                        $sth=$conn->prepare("INSERT INTO cart(Content, Payment, Order_ID) SELECT product_name, cost, Product_ID FROM products WHERE product_name = id");
-                                        echo '<script>alert(id)</script>';
-                                        $sth->execute();
+					?>
+					<div>
+                                                        <a>
+
+                                                        <button id="<?php echo $_SESSION["id"]?>"
+							onclick="removeFromCart(this.id, <?php echo $row["Product_ID"]?>, <?php echo $row["quantity"]?>); pageReload();">Subtract</button>
+							
+							<button id="<?php echo $row["Product_ID"]?>" onclick= "productpage(this.id)">info</button>
+                                                        
+							<p>Cost: <?php echo $row["cost"] * $row["quantity"]; ?>kr       Quantity:<?php echo $row["quantity"]?>st </p>
+
+                                                        </a>
+                                        <div>
+					<?php 
+                                        echo "<br><br>";
                                 }
 
                                 mysqli_close($con);
 
                         ?>
 
-			<button id="payall" onclick = "paymentpage()">Processed to checkout</button>
-        		
+			<button id="payall" onclick = "paymentpage(2, <?php echo $_SESSION['id'] ?>)">Processed to checkout</button>
+
+			<script>
+			function productpage(this_id){
+				window.location.href="productpage.php?q=" + this_id;
+			}
+			
+			function pageReload(){
+				window.location.href=window.window.location.href;
+			}
+			</script>
+
+			<script>
+			function removeFromCart(uID, pID, pQ){
+				var xmlhttp = new XMLHttpRequest();
+                		xmlhttp.onreadystatechange = function(){
+                        		if(this.readyState == 4 && this.state == 200){                                                                                  
+						document.getElementById("txtHint").innerHTML = this.responseText;
+                        		}
+                		};
+                		xmlhttp.open("GET", "removefromcart.php?a="+uID + "&b="+pID + "&c="+pQ, true);
+                		xmlhttp.send();
+			}
+			</script>
+			        		
 	</article>
               
         </section>
         <footer>
                 <p>Contact: Oliver, Johan or alex for futher questions</p>
         </footer>
+
+	 <script>
+
+
+
+        function paymentpage(part, this_id){
+                window.location.href="payment.php?q="+ part + "&p="+this_id;
+        }
+        </script>
 </body>
 
 </html>

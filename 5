@@ -131,16 +131,20 @@ $disch = $_GET['b'];
         $username = "root";
         $password = "d0018eServer!";
         $dbname = "store";
+	echo $pid;
 // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
         // Check connection
-       
-
-
-	$sql="UPDATE products SET disc  = '$disch' WHERE Product_ID = '".$pid."'";        
+        if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+        }
+	echo $pid;
+	echo $disc;
+	$sql="UPDATE stock SET cost  = '5' WHERE Product_ID = '".$pid."'";        
 
         $conn->query($sql);
-       
+        echo $pid;
+	echo $disc;
 	$conn->close();
 
 }

@@ -1,3 +1,15 @@
+<?php
+// Initialize the session
+session_start();
+ 
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php");
+    exit;
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,14 +29,13 @@ body {
 
 
 /* Style the header */
-
 header
 {
-	font-family: "Courier New", Courier, monospace;
-	padding: 20px;
-	text-align: center;
-	font-size: 35px;
-	color: black;
+        font-family: "Courier New", Courier, monospace;
+        padding: 20px;
+        text-align: center;
+        font-size: 35px;
+        color: black;
 }
 
 
@@ -93,13 +104,17 @@ aside {
 </head>
 <body>
 
-        <header>
-                <h2>PhoneStore666</h2>
-        </header>
+        <a href="/frontpage.php">
+                <header>
+                        <h1>PhoneStore666 </h1>
+                </header>
+        </a>
+	
         <aside>
                 <p>We have had a goal in life. We wanted to spread and show the true love which one can only experience. If you have never known of this love, we will show you the way. Vintage phones wil never abanden you, they are eternal</p>
 	<button onclick="document.location='cart.php'">Cart</button>	
-        </aside>
+        <button onclick="document.location='logout.php'">Logout</button>
+	</aside>
         <section>
                 <article>
                		<h1> Products </h1> 
@@ -108,50 +123,46 @@ aside {
                                 $username = "root";
                                 $password = "d0018eServer!";
                                 $dbname = "store";
+				$dbname2 = "user";
 			
 				// Create connection
                                 $conn = new mysqli($servername, $username, $password, $dbname);
-                        // Check connection
+                        	// Check connection
                                 if ($conn->connect_error) {
                                         die("Connection failed: " . $conn->connect_error);
                                 }
-				
-				mysqli_select_db($con,"ajax_demo");
-                                $sql="SELECT product_name, stock, overall_grading, cost, picture FROM products";
+
+								
+	
+				mysqli_select_db($conn,"ajax_demo");
+                                $sql="SELECT Product_ID, product_name, cost, picture FROM products";
 				$result = $conn->query($sql);
 				
-
 				while($row = $result->fetch_assoc()) {
+					$pro = $row['Product_ID'];	
+				    	mysqli_select_db($conn,"ajax_demo");
+                                	$sqlstock="SELECT stock FROM stock where Product_ID = '".$pro."'";
+                                	$amount = $conn->query($sqlstock); 
+					$rowS = $amount->fetch_assoc();
+
 
         				echo  $row["product_name"].  "<br>";
-        				
-        				
 					?>
 
  					<img src= "<?php echo $row["picture"]; ?>" width="200" height="200"/>
 						<div>
-							<button id="<?php echo $row["product_name"]?>" onclick = "paymentpage(this.id)">Direct to buy</button>
-
-							<form method="POST" action="">
-								<input type="submit" id="<?php echo $row["product_name"]?>" name="data" value="Add to cart"/>
-							</form>
-
-							<button id="<?php echo $row["product_name"]?>" onclick = "productpage(this.id)">info</button>
+							<button id="<?php echo $row["Product_ID"]?>" onclick = "paymentpage(1, this.id)">Direct to buy</button>
+							
+						 	<button id="<?php echo $_SESSION["id"]?>" onclick= "addToCart(this.id, <?php echo $row["Product_ID"]?>, <?php echo $row["cost"]?>)">Add to cart</button>						
+							<button id="<?php echo $row["Product_ID"]?>" onclick = "productpage(this.id)">info</button>
 							<a>
-								<p>Cost: <?php echo $row["cost"]; ?>kr       Stock:<?php echo $row["stock"]; ?>st </p>
+								<p>Cost: <?php echo $row["cost"]; ?>kr       Stock:<?php echo $rowS['stock']; ?>st </p>
 							</a>
 						<div>
 					<?php
         			
 					echo "<br><br>";
 				}
-			
-				if(isset($_POST['data'])){
-                                        $sth=$conn->prepare("INSERT INTO cart(Content, Payment, Order_ID) SELECT product_name, cost, Product_ID FROM products WHERE product_name = id");
-					echo '<script>alert(id)</script>';
-					$sth->execute();
-                                }
-	
 				mysqli_close($con);
 			?>
 
@@ -164,8 +175,21 @@ aside {
 	</script>
 
 	<script>
-	function paymentpage(this_id){
-		window.location.href="payment.php?q=" + this_id;
+	function paymentpage(part, this_id){
+		window.location.href="payment.php?q=" + part + "&p=" + this_id;
+	}
+	</script>
+	
+	<script>
+	function addToCart(uID, pID, pCost){
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function(){
+			if(this.readyState == 4 && this.state == 200){
+				document.getElementById("txtHint").innerHTML = this.responseText;
+			}
+		};
+		xmlhttp.open("GET", "addtocart.php?a="+uID + "&b="+pID + "&c="+pCost, true);
+		xmlhttp.send();
 	}
 	</script>
                 
@@ -180,15 +204,41 @@ aside {
                                 </form>
                         </aside>
                         <nav>
-                                <ul>
-                                        <li><a href="#">Product1</a></li>
-                                        <li><a href="#">Product2</a></li>
-                                </ul>
+      				 <ul>
+				<?php
+                                $servername = "localhost";
+                                $username = "root";
+                                $password = "d0018eServer!";
+                                $dbname = "store";
+
+                                // Create connection
+                                $conn = new mysqli($servername, $username, $password, $dbname);
+                                // Check connection
+                                if ($conn->connect_error) {
+                                        die("Connection failed: " . $conn->connect_error);
+                                }
+
+                                mysqli_select_db($conn,"ajax_demo");
+                                $sql="SELECT Product_ID, product_name, cost, picture FROM products";
+                                $result = $conn->query($sql);
+                                while($row = $result->fetch_assoc()) {
+                                        ?>
+                                                
+                               			<li><a id="<?php echo $row['Product_ID']?>"  onclick = "productpage(this.id)"><?php echo $row["product_name"]?></a></li>                     
+                                                
+                                        <?php
+
+                                        echo "<br>";
+                                }
+                                mysqli_close($con);
+                        ?>
+                               
+                               </ul>
                         </nav>
                 </article>
         </section>
         <footer>
-                <p>Informastion</p>
+                <p> Contact Alex, Johan, or Oliver for any further questions </p>
         </footer>
 
 </body>

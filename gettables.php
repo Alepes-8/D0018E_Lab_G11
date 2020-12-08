@@ -5,7 +5,7 @@
 <style>
 
 table{
-        width: 1000px;
+        width: 800px;
         border-collapse: collapse;
 }
 
@@ -35,28 +35,19 @@ if (!$con) {
         die('Could not connect: ' . mysqli_error($con));
 }
 
-if($q==1){
-        mysqli_select_db($con,"ajax_demo");
-        $sql="SELECT * FROM stock";
-        $result = mysqli_query($con,$sql);
+$dbname2 = "user";
 
-        echo "<table>
-        <tr>
-        <th>p_ID</th>
-        <th>s_amount</th>
-        </tr>";
-
-        while($row = mysqli_fetch_array($result)) {
-                echo "<tr>";
-                echo "<td>" . $row['p_ID'] . "</td>";
-                echo "<td>" . $row['s_amount'] . "</td>";
-                echo "</tr>";
-        }
-        echo "</table>";
-        mysqli_close($con);
+$user = mysqli_connect($servername, $username, $password, $dbname2);
+if (!$user) {
+        die('Could not connect: ' . mysqli_error($con));
 }
 
 if($q==2){
+	?>
+	<h1> Order Informastion </h1>
+	<?php
+	mysqli_close($user);
+
         mysqli_select_db($con,"ajex_demo");
         $sql="SELECT * FROM order_informastion";
         $result = mysqli_query($con,$sql);
@@ -92,21 +83,48 @@ if($q==2){
 
 	echo "</table>";
 ?>
-	<h1> Take away order </h1>
+	<h3> Take away order </h3>
 	<form >
 
-                                <label for ="deleteID"> Order_ID(Order which you wish to take away): </label><br>
-                                <input type="number" id="deleteID" name="deleteID" required=""  value=""><br>
+                                <label for ="delID"> Order_ID(Order which you wish to take away): </label><br>
+                                <input typ="number" id="delID" name="delID" required=""  value="" maxlength ="8"><br>
 
-                                <button type="submit" id="delete" onclick="delete(deleteID.value)">
+                                <button type="submit" id="takeaway" onclick="orderdel(7, delID.value)">
                                 Submit </button>
         </form>	
 
+<h1> Products ordered </h1>
 <?php
-      
+	
+ mysqli_select_db($con,"ajex_demo");
+        $sql="SELECT * FROM orders";
+        $result = mysqli_query($con,$sql);
+
+        echo"<table>
+        <tr>
+        <th>Order_ID</th>
+        <th>Quantity</th>
+        <th>Product_ID</th>
+        </tr>";
+
+        while($row = mysqli_fetch_array($result)) {
+                echo "<tr>";
+                echo "<td>" . $row['order_ID'] . "</td>";
+                echo "<td>" . $row['order_quantity'] . "</td>";
+                echo "<td>" . $row['Product_ID'] . "</td>";
+                echo "</tr>";
+        }
+
+        echo "</table>";
+	      
         mysqli_close($con);
 }
 if($q==3){
+	?>
+	<h1> Store Products </h1>
+	<?php
+
+	mysqli_close($user);
 
 	mysqli_select_db($con,"ajex_demo");
         $sql="SELECT * FROM products";
@@ -117,8 +135,6 @@ if($q==3){
         <tr>
         <th>Product_ID</th>
         <th>product_name</th>
-	<th>stock</th>
-        <th>overall_grading</th>
 	<th>cost</th>
         <th>Descripton</th>
         </tr>";
@@ -131,8 +147,6 @@ if($q==3){
 
                 echo "<td>" . $row['Product_ID'] . "</td>";
                 echo "<td>" . $row['product_name'] . "</td>";
-         	echo "<td>" . $row['stock'] . "</td>";
-                echo "<td>" . $row['overall_grading'] . "</td>";
                 echo "<td>" . $row['cost'] . "</td>";
                 echo "<td>" . $row['disc'] . "</td>";
 		echo "</tr>";
@@ -141,21 +155,118 @@ if($q==3){
 		
 
         echo "</table>";
-        echo "<br> <br>";
+        
 ?>	
 		
 
 	<button id="proadd" onclick="editdata(1)">Add product</button>
 	<button id="proedit" onclick=" editdata(2)"> Edit </button>	
-	<button id="stockedit" onclick=" editdata(3)"> add/sub stock </button>	 
-        
-	
-
+        <button id="stockedit" onclick=" editdata(4)"> delete </button>        
+	<br><br>	
+	<h1> Store Stock </h1>
 <?php
 
-	mysqli_close($con);
-}
+	
 
+	
+
+	mysqli_select_db($con,"ajax_demo");
+        $sql="SELECT * FROM stock";
+        $result = mysqli_query($con,$sql);
+
+        echo "<table>
+        <tr>
+        <th>Product_ID</th>
+        <th>stock</th>
+        </tr>";
+
+        while($row = mysqli_fetch_array($result)) {
+                echo "<tr>";
+                echo "<td>" . $row['Product_ID'] . "</td>";
+                echo "<td>" . $row['stock'] . "</td>";
+                echo "</tr>";
+        }
+        echo "</table>";
+	?>
+	<button id="stockedit" onclick=" editdata(3)"> add/sub stock </button>
+	<br> <br>
+	<h1> Comments </h1>
+	<?php
+		
+	
+        mysqli_select_db($con,"ajax_demo");
+        $sql="SELECT * FROM grading_commenting";
+        $result = mysqli_query($con,$sql);
+
+        echo "<table>
+        <tr>
+	<th>Number</th>
+        <th>Product_ID</th>
+        <th>name</th>
+	<th>grading</th>
+	<th>comment</th>
+        </tr>";
+
+        while($row = mysqli_fetch_array($result)) {
+                echo "<tr>";
+		echo "<td>" . $row['num'] . "</td>";
+                echo "<td>" . $row['Product_ID'] . "</td>";
+                echo "<td>" . $row['name'] . "</td>";
+		echo "<td>" . $row['grading'] . "</td>";
+		echo "<td>" . $row['comment'] . "</td>";
+                echo "</tr>";
+        }
+        echo "</table>";
+        ?>
+       <form >
+
+                                <label for ="delID"> Delete grading/comment (write the number of the comment/grading): </label><br>
+                                <input type="number" id="delID" name="delID" required=""  value="">
+
+                                <button type="submit" id="takeaway" onclick="orderdel(10, delID.value)">
+                                Submit </button>
+        </form>
+        <?php	
+
+        mysqli_close($con);
+}
+if($q == 4){
+	?>
+	<h1> User informastion </h1>
+	<?php
+	mysqli_select_db($user,"ajex_demo");
+        $sql="SELECT * FROM login";
+        $result = mysqli_query($user,$sql);
+
+        echo"<table>
+        <tr>
+        <th>username</th>
+        <th>password</th>
+        </tr>";
+
+        while($row = mysqli_fetch_array($result)) {
+                echo "<tr>";
+                echo "<td>" . $row['username'] . "</td>";
+                echo "<td>" . $row['password'] . "</td>";
+                echo "</tr>";
+        }
+
+        echo "</table>";
+
+	?>
+        <h3> Delete user </h3>
+        <form >
+		<label for ="usedel"> Username(write the user name to delete): </label><br>
+                <input type="name" id="usedel" name="usedel" required="" maxlength = "50" size ="50" value=""><br>
+
+                <button type="submit" id="takeaway" onclick="orderdel(8, usedel.value)"> Submit </button>
+        </form>
+	
+<?php
+	
+	mysqli_close($user);
+	 mysqli_close($con);
+}
 ?>
 </body>
 </html>
