@@ -181,7 +181,7 @@ aside {
 			}
 			
 			function pageReload(){
-				window.location.href=window.window.location.href;
+				window.location.href = window.location.href;
 			}
 			</script>
 

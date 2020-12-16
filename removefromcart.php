@@ -20,7 +20,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 $conn2 = new mysqli($servername, $username, $password, $dbname2);
 
 mysqli_select_db($conn2, "cart_test");
-$sql = "SELECT id, Product_ID, quantity FROM cart WHERE id = '".$uID."'";
+$sql = "SELECT id, Product_ID, quantity FROM cart WHERE id = '".$uID."' AND Product_ID = '".$pID."'";
 $result = $conn2->query($sql);
 
 $row = $result->fetch_assoc();
@@ -31,8 +31,6 @@ if($row['quantity'] == 1){
         $conn2->query($sql);
 }
 else{
-
-
         // remove from cart
         $sql = "UPDATE cart SET quantity = quantity - 1 WHERE id = '".$uID."' AND Product_ID = '".$pID."'";
         $conn2->query($sql);

@@ -257,7 +257,7 @@ if($q == 4){
         <h3> Delete user </h3>
         <form >
 		<label for ="usedel"> Username(write the user name to delete): </label><br>
-                <input type="name" id="usedel" name="usedel" required="" maxlength = "50" size ="50" value=""><br>
+                <input type="name" id="usedel" name="usedel" required="" maxlength = "45" size ="50" value=""><br>
 
                 <button type="submit" id="takeaway" onclick="orderdel(8, usedel.value)"> Submit </button>
         </form>
