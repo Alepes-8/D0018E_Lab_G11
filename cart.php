@@ -155,9 +155,10 @@ aside {
 					?>
 					<div>
                                                         <a>
-
-                                                        <button id="<?php echo $_SESSION["id"]?>"
-							onclick="removeFromCart(this.id, <?php echo $row["Product_ID"]?>, <?php echo $row["quantity"]?>); pageReload();">Subtract</button>
+							
+							<button id="<?php echo $_SESSION["id"]?>" onclick="addToCart(this.id, <?php echo $row["Product_ID"]?>, <?php echo $row["quantity"]?>); pageReload();">Add</button>
+								
+                                                        <button id="<?php echo $_SESSION["id"]?>" onclick="removeFromCart(this.id, <?php echo $row["Product_ID"]?>, <?php echo $row["quantity"]?>); pageReload();">Subtract</button>
 							
 							<button id="<?php echo $row["Product_ID"]?>" onclick= "productpage(this.id)">info</button>
                                                         
@@ -186,6 +187,17 @@ aside {
 			</script>
 
 			<script>
+			function addToCart(uID, pID, pQ){
+                                        var xmlhttp = new XMLHttpRequest();
+                                        xmlhttp.onreadystatechange = function(){
+                                                if(this.readyState == 4 && this.state == 200){
+                                                        document.getElementById("txtHint").innerHTML = this.responseText;
+                                                }
+                                        };
+                                        xmlhttp.open("GET", "addtocart.php?a="+uID + "&b="+pID + "&c="+pQ, true);
+                                        xmlhttp.send();
+                        }
+				
 			function removeFromCart(uID, pID, pQ){
 				var xmlhttp = new XMLHttpRequest();
                 		xmlhttp.onreadystatechange = function(){
