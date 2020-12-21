@@ -182,7 +182,7 @@ aside {
 			}
 			
 			function pageReload(){
-				window.location.href = window.location.href;
+				setTimeout(function(){window.location.href = window.location.href;}, 300);
 			}
 			</script>
 
